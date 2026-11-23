@@ -1,0 +1,58 @@
+<p align="center">
+  <img src="assets/ideas-unstuck_logo.png" alt="Ideas, Unstuck" width="560">
+</p>
+
+# Ideas, Unstuck
+
+**Every gadget needs a real reason.**
+
+The build notes behind the video series *Ideas, Unstuck* on [@workFLOw42](https://www.youtube.com/@workFLOw42) —
+the real story of how our home learned to think along: smart speakers that became a story box for kids
+(no phone needed), a randomizer for audio books, silent wake-up, school info in one place, solar curtains
+that charge when the sun actually hits the window, kids helping to build their own controllers, and
+3D-printed figures.
+
+> 🚧 **Work in progress.** The series is in production; this repo grows with it.
+
+## Three ideas behind everything
+
+1. **Every gadget needs a real reason.** Having it is nice. Using it for something that matters is the point.
+2. **The data is usually already there.** Find the API or an existing integration, fetch it, process it.
+   The portal doesn't matter — the idea does.
+3. **Idea: human. Code: AI. Checked: human.** I last wrote code at university. Everything here was built
+   with the help of AI — and only kept when it really worked.
+
+## Watch the series
+
+▶️ **YouTube:** [@workFLOw42](https://www.youtube.com/@workFLOw42) — *Ideas, Unstuck* (playlist link follows with Part 1). Other platforms may follow later.
+
+## Structure — example code per episode
+
+Each episode gets its own folder with a short guide and the example code shown in it —
+always two ways: **build it yourself** and **build it with AI**.
+
+```
+episodes/
+  00-trailer/
+  01-my-smart-home-wasnt-smart/
+  02-one-system-instead-of-five-apps/
+  03-the-first-chip/
+  04-the-randomizer/
+  …
+shared/          building blocks used by several episodes (blueprints, ESPHome packages, secrets.yaml.example)
+3d/              printable cases (STL/3MF)
+```
+
+No videos in this repo — only guides and code. Everything is cleaned up: no real credentials, IDs,
+addresses or anything that points to a real home.
+
+## Built with
+
+- [Home Assistant](https://www.home-assistant.io) · [ESPHome](https://esphome.io)
+- [adonno/tagreader](https://github.com/adonno/tagreader) — the NFC reader that started it all
+- [M5Stack](https://m5stack.com) modules (LEGO Technic compatible, plug-and-play)
+- My own integrations: [DSB_Mobile_Api](https://github.com/workFLOw42/DSB_Mobile_Api) · [Elternportal_API](https://github.com/workFLOw42/Elternportal_API) · [ha-deutsche-ferien](https://github.com/workFLOw42/ha-deutsche-ferien)
+
+## License
+
+Code: [MIT](LICENSE). 3D files in `3d/`: [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) (see `3d/LICENSE.md` once added).
