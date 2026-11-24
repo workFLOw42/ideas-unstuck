@@ -1,0 +1,170 @@
+# Ideas, Unstuck · Part 2 — "One system instead of five apps"
+# Living room: one automation for real wall switches, a dial and a TV light.
+#
+# Two kinds of smart lamps live in this room — and they need different handling:
+#
+#   A) CEILING: smart bulbs behind a smart wall RELAY. The wall switch cuts the power.
+#      -> When the power comes back, the bulbs start with their default light and need a moment
+#         to reconnect before they accept a scene.
+#      -> The ceiling only counts as "on" if the relay is on AND the bulbs report "on".
+#
+#   B) DINING TABLE + TV LIGHT: always powered. Their wall switches are just BUTTONS
+#      that tell Home Assistant what to do (scene on / light off).
+#
+# "More lamps, more light": the TV light picks its scene by looking at the other lamps.
+#
+# Simplified from a real setup.
+
+# PLACEHOLDERS — replace them (including the brackets) with your own entity IDs:
+#   [room_01]          the room, only used in the name
+#   [relay_01]         smart wall relay that CUTS THE POWER to the ceiling bulbs      (switch.)
+#   [light_01]         the ceiling bulbs behind that relay (type A)                    (light.)
+#   [light_02]         an always-powered lamp, e.g. above the dining table (type B)    (light.)
+#   [light_group_01]   a group of always-powered lamps, e.g. the TV light (type B)    (light.)
+#   [wall_button_01]   wall button for [light_02]                                     (switch.)
+#   [wall_button_02]   wall button for [light_group_01]                               (switch.)
+#   [dial_01]          the rotate event of a dimmer dial (e.g. a Hue tap dial)        (event.)
+#   [scene_01]         ceiling scene · [scene_02] dining scene
+#   [scene_03]         TV light, subtle · [scene_04] TV light, bright (when more lamps are on)
+#
+alias: "[room_01] – light logic"
+description: "Wall relay (power-switched bulbs) + wall buttons (always-powered lamps) + dial + TV light that adapts."
+mode: restart
+
+triggers:
+  # A) the relay in the wall, switched by hand
+  - trigger: state
+    entity_id: switch.[relay_01]
+    not_from: [unavailable, unknown]
+    not_to: [unavailable, unknown]
+    id: relay
+  # A) ceiling bulbs switched off from an app/hub while the relay stays on
+  - trigger: state
+    entity_id: light.[light_01]
+    from: "on"
+    to: "off"
+    for: "00:00:01"
+    id: ceiling_off
+  # B) wall buttons for the always-powered lamps
+  - trigger: state
+    entity_id: switch.[wall_button_01]
+    not_from: [unavailable, unknown]
+    not_to: [unavailable, unknown]
+    id: button_dining
+  - trigger: state
+    entity_id: switch.[wall_button_02]
+    not_from: [unavailable, unknown]
+    not_to: [unavailable, unknown]
+    id: button_tv_light
+  # a rotary dial (e.g. a Hue tap dial): dims whatever is on
+  - trigger: state
+    entity_id: event.[dial_01]
+    not_from: [unavailable, unknown]
+    not_to: [unavailable, unknown]
+    id: dial
+
+variables:
+  relay_on: "{{ is_state('switch.[relay_01]', 'on') }}"
+  # A) a power-switched lamp is only "on" if it actually has power
+  ceiling_on: "{{ relay_on and is_state('light.[light_01]', 'on') }}"
+  dining_on: "{{ is_state('light.[light_02]', 'on') }}"
+  # a light GROUP can report "off" while one lamp in it is still on (dimmed) — count the members
+  tv_light_on: "{{ expand('light.[light_group_01]') | selectattr('state', 'eq', 'on') | list | count > 0 }}"
+
+actions:
+  - choose:
+      # ---------- A) relay switched by hand ----------
+      - conditions: "{{ trigger.id == 'relay' }}"
+        sequence:
+          - if: "{{ relay_on }}"
+            then:
+              # power is back: wait until the bulbs have reconnected, THEN set the scene
+              - wait_template: "{{ is_state('light.[light_01]', 'on') }}"
+                timeout: "00:00:10"
+              - delay: "00:00:01"
+              - action: scene.turn_on
+                target:
+                  entity_id: scene.[scene_01]
+                data:
+                  transition: 0.5
+
+      # ---------- A) bulbs turned off elsewhere -> switch the relay off too ----------
+      # Ping-pong lock: some hubs report "off" about a second late. If you switch off and
+      # straight back on, the late "off" would turn the relay off again. Only sync if the
+      # relay hasn't changed in the last 3 seconds.
+      - conditions: >-
+          {{ trigger.id == 'ceiling_off' and relay_on
+             and (now() - states.switch['[relay_01]'].last_changed).total_seconds() > 3 }}
+        sequence:
+          - action: switch.turn_off
+            target:
+              entity_id: switch.[relay_01]
+
+      # ---------- B) buttons for always-powered lamps ----------
+      - conditions: "{{ trigger.id == 'button_dining' }}"
+        sequence:
+          - if: "{{ dining_on }}"
+            then:
+              - action: light.turn_off
+                target:
+                  entity_id: light.[light_02]
+            else:
+              - action: scene.turn_on
+                target:
+                  entity_id: scene.[scene_02]
+                data:
+                  transition: 0.5
+
+      - conditions: "{{ trigger.id == 'button_tv_light' }}"
+        sequence:
+          - if: "{{ tv_light_on }}"
+            then:
+              - action: light.turn_off
+                target:
+                  entity_id: light.[light_group_01]
+            else:
+              # set on + brightness + colour in ONE command (a bare "on" first flashes the old brightness)
+              - action: scene.turn_on
+                target:
+                  entity_id: >-
+                    {{ 'scene.[scene_04]' if ceiling_on and dining_on
+                       else 'scene.[scene_03]' }}
+                data:
+                  transition: 0.5
+
+      # ---------- dial: dim everything that is on ----------
+      - conditions: "{{ trigger.id == 'dial' }}"
+        sequence:
+          - variables:
+              lights_on: >-
+                {{ expand('light.[light_01]', 'light.[light_02]', 'light.[light_group_01]')
+                   | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list }}
+          - if: "{{ lights_on | count > 0 }}"
+            then:
+              - action: light.turn_on
+                target:
+                  entity_id: "{{ lights_on }}"
+                data:
+                  brightness_step_pct: "{{ 5 if trigger.to_state.attributes.event_type == 'clock_wise' else -5 }}"
+                  transition: 0.5
+          - stop: "dimmed"
+
+  # ---------- more lamps, more light ----------
+  # If the TV light is on and the ceiling or dining lamp changed, the TV light follows.
+  # Re-read the states first: the variables above were taken BEFORE we switched anything.
+  - if: "{{ trigger.id in ['relay', 'ceiling_off', 'button_dining'] }}"
+    then:
+      - delay: "00:00:00.5"
+      - variables:
+          ceiling_now: "{{ is_state('switch.[relay_01]', 'on') and is_state('light.[light_01]', 'on') }}"
+          dining_now: "{{ is_state('light.[light_02]', 'on') }}"
+          tv_now: "{{ expand('light.[light_group_01]') | selectattr('state', 'eq', 'on') | list | count > 0 }}"
+      - if: "{{ tv_now }}"
+        then:
+          - action: scene.turn_on
+            target:
+              entity_id: >-
+                {{ 'scene.[scene_04]' if ceiling_now and dining_now
+                   else 'scene.[scene_03]' }}
+            data:
+              transition: 0.5

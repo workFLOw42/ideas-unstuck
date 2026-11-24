@@ -1,0 +1,40 @@
+# Ideas, Unstuck · Part 2 — "Everyone's out of the house? Lights and music switch off."
+#
+# Lessons from the real setup:
+#
+# 1) Ask "does ANY tracker say home?" — not "do ALL trackers say away?".
+#    Router-based trackers (Wi-Fi presence) often become "unavailable" after a router restart
+#    until each phone is back in the Wi-Fi — which is exactly the case while you are away.
+#    "All away" would then never become true.
+#
+# 2) Wi-Fi presence is not physical presence. A phone connected via VPN can look "home".
+#    For important decisions, use at least one signal that needs you to be physically there
+#    (for example a Bluetooth beacon you walk past when you come in).
+#
+# 3) Wait a while (here: 1 hour) so a quick trip to the bakery doesn't switch the house off.
+
+# PLACEHOLDERS — replace them (including the brackets) with your own entity IDs:
+#   [tracker_01] … [tracker_n]   one presence tracker per person                (device_tracker.)
+#   [light_group_all]            a light group with every lamp in the home      (light.)
+#   [speaker_01] … [speaker_n]   your speakers                                  (media_player.)
+#
+alias: "Nobody home – lights and music off"
+description: "No tracker reports home for 1 hour -> all lights off, all speakers paused."
+mode: single
+
+triggers:
+  - trigger: template
+    value_template: >-
+      {{ ['device_tracker.[tracker_01]', 'device_tracker.[tracker_02]', 'device_tracker.[tracker_03]'] | select('is_state', 'home') | list | count == 0 }}
+    for: "01:00:00"
+
+actions:
+  - action: light.turn_off
+    target:
+      entity_id: light.[light_group_all]           # a light group with every lamp in the home
+  - action: media_player.media_pause
+    target:
+      entity_id:
+        - media_player.[speaker_01]
+        - media_player.[speaker_02]
+        - media_player.[speaker_03]

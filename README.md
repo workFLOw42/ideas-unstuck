@@ -53,6 +53,28 @@ addresses or anything that points to a real home.
 - [M5Stack](https://m5stack.com) modules (LEGO Technic compatible, plug-and-play)
 - My own integrations: [DSB_Mobile_Api](https://github.com/workFLOw42/DSB_Mobile_Api) · [Elternportal_API](https://github.com/workFLOw42/Elternportal_API) · [ha-deutsche-ferien](https://github.com/workFLOw42/ha-deutsche-ferien)
 
+## More of my projects
+
+Same idea, different places: a real problem first, then my own tool for it.
+
+**Home Assistant integrations**
+- [DSB_Mobile_Api](https://github.com/workFLOw42/DSB_Mobile_Api) — school substitution plans in Home Assistant
+- [Elternportal_API](https://github.com/workFLOw42/Elternportal_API) — school letters, appointments and timetables from the parents' portal
+- [ha-deutsche-ferien](https://github.com/workFLOw42/ha-deutsche-ferien) — German school holidays and public holidays for all 16 states
+
+**Apps**
+- [MeineNoten](https://github.com/workFLOw42/MeineNoten) — sheet music on a tablet, pages turned with a Bluetooth foot pedal, so both hands stay on the guitar
+- [workFLOw01](https://github.com/workFLOw42/workFLOw01) — a minimal analog watch face for Wear OS with moon phases
+
+**3D printing** (parametric, OpenSCAD)
+- [3D_Cable_box](https://github.com/workFLOw42/3D_Cable_box) — cable box with removable Voronoi walls and a sliding lid
+- [3D_OralB_Sonicare_toothbrush_holder](https://github.com/workFLOw42/3D_OralB_Sonicare_toothbrush_holder) — holder for electric toothbrushes with exchangeable inserts
+
+**Games**
+- [flightsimulator](https://github.com/workFLOw42/flightsimulator) — a small flight simulator built for my kids
+
+All public projects: [github.com/workFLOw42](https://github.com/workFLOw42)
+
 ## License
 
 Code: [MIT](LICENSE). 3D files in `3d/`: [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) (see `3d/LICENSE.md` once added).

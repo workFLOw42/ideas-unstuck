@@ -1,0 +1,47 @@
+# Ideas, Unstuck · Part 2 — "The TV goes on after dark? The lights dim on their own."
+#
+# Lesson from the real setup: SUNSET IS TOO EARLY. The sky is still bright for a while.
+# Measured on a September evening: sunset 19:26, civil dusk 19:53 — almost half an hour.
+# A sun elevation threshold between sunset (≈ -0.8°) and civil dusk (-6°) works well;
+# -2° is a good start. Tune it to your windows.
+#
+# Second rule: WHAT IS ALREADY ON, STAYS. If someone set up or dimmed the light by hand,
+# the TV must not overwrite it. The automation only acts if the TV light is completely off.
+
+# PLACEHOLDERS — replace them (including the brackets) with your own entity IDs:
+#   [tv_01]            your TV                                                  (media_player.)
+#   [light_group_01]   the TV light (one lamp or a group)                       (light.)
+#   [scene_05]         TV light, dimmed — e.g. 25 % warm white                  (scene.)
+#
+alias: "TV on after dark – dimmed TV light"
+description: "TV turns on (or it gets dark while the TV runs) -> TV light on, dimmed. Never touches lamps that are already on."
+mode: single
+
+triggers:
+  - trigger: state
+    entity_id: media_player.[tv_01]
+    from: "off"
+    to: "on"
+  - trigger: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: -2
+
+conditions:
+  - condition: state
+    entity_id: media_player.[tv_01]
+    state: "on"
+  - condition: numeric_state
+    entity_id: sun.sun
+    attribute: elevation
+    below: -2
+  # what is already on, stays: only if ALL TV lamps are off (a group can say "off" while one lamp is dimmed)
+  - condition: template
+    value_template: "{{ expand('light.[light_group_01]') | selectattr('state', 'eq', 'on') | list | count == 0 }}"
+
+actions:
+  - action: scene.turn_on
+    target:
+      entity_id: scene.[scene_05]   # e.g. 25 % warm white
+    data:
+      transition: 2
