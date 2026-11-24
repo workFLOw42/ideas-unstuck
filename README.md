@@ -24,7 +24,7 @@ that charge when the sun actually hits the window, kids helping to build their o
 
 ## Watch the series
 
-▶️ **YouTube:** [@workFLOw42](https://www.youtube.com/@workFLOw42) — *Ideas, Unstuck* (playlist link follows with Part 1). Other platforms may follow later.
+▶️ **YouTube:** [Ideas, Unstuck — the playlist](https://www.youtube.com/playlist?list=PLeLg2Pkrl_X4) · channel [@workFLOw42](https://www.youtube.com/@workFLOw42)
 
 ## Structure — example code per episode
 
