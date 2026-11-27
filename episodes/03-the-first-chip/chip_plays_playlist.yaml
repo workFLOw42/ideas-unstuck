@@ -1,0 +1,64 @@
+# Ideas, Unstuck · Part 3 — "Every chip gets its own playlist. Put it on the reader, and the music starts."
+#
+# Lessons from the real setup:
+#
+# 1) Recognise the reader by its DEVICE NAME, not by its device_id.
+#    A device_id is a random registry ID. It changes when a device is re-added to Home Assistant.
+#    In my setup that happened to both readers at once — and the old IDs in the condition were
+#    simply never true again. No error, a healthy-looking trace, and for a week no chip started
+#    any music. The name comes from the ESPHome config (friendly_name) and survives re-adding.
+#
+# 2) ONE list for all chips. The key of each entry is the chip's tag ID, the value says what to play.
+#    New album → one new line, nothing else to touch.
+#
+# 3) Unknown chip? Don't guess — write it to the log. Then look it up in
+#    Settings → Tags (every scanned chip shows up there) and add it to the list.
+#
+# PLACEHOLDERS — replace them (including the brackets):
+#   [reader_name_01] …     the reader's friendly_name from its ESPHome config   (e.g. Kids_TagReader)
+#   [speaker_01] …         the speaker in the same room                         (media_player.)
+#   [tag_id_01] …          the chip's tag ID                                    (Settings → Tags)
+#   [playlist_uri_01] …    what your music integration plays                    (e.g. a playlist or album URI)
+#
+alias: "Chip on the reader – play its playlist"
+description: "A chip is scanned on one of the readers -> look it up -> play it on the speaker in that room."
+mode: queued
+
+triggers:
+  - trigger: event
+    event_type: tag_scanned
+
+variables:
+  # which reader belongs to which speaker
+  readers:
+    "[reader_name_01]": media_player.[speaker_01]
+    "[reader_name_02]": media_player.[speaker_02]
+  # one line per chip: tag ID -> what to play
+  chips:
+    "[tag_id_01]": { uri: "[playlist_uri_01]", type: playlist }   # e.g. album A
+    "[tag_id_02]": { uri: "[playlist_uri_02]", type: playlist }   # e.g. story B
+    "[tag_id_03]": { uri: "[playlist_uri_03]", type: album }      # e.g. album C
+  reader: "{{ device_attr(trigger.event.data.device_id | default(''), 'name') }}"
+  tag: "{{ trigger.event.data.tag_id | default('') }}"
+
+conditions:
+  # only our readers (a phone scanning a tag also fires tag_scanned)
+  - condition: template
+    value_template: "{{ reader in readers }}"
+
+actions:
+  - if:
+      - condition: template
+        value_template: "{{ tag in chips }}"
+    then:
+      - action: media_player.play_media
+        target:
+          entity_id: "{{ readers[reader] }}"
+        data:
+          media_content_id: "{{ chips[tag].uri }}"
+          media_content_type: "{{ chips[tag].type }}"
+    else:
+      - action: system_log.write
+        data:
+          level: warning
+          message: "Unknown chip {{ tag }} on {{ reader }} – add it to the chip list."

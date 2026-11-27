@@ -2,6 +2,8 @@
 
 > *"That's not smart. That's homework."*
 
+▶️ **Watch:** [Part 1 on YouTube](https://youtube.com/shorts/_x9Uto50TOY)
+
 No code in this part — it's about the problem.
 
 ## What I had

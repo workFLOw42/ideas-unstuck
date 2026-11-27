@@ -2,6 +2,8 @@
 
 > *"Smart isn't more gadgets. It's things working together."*
 
+▶️ **Watch:** [Part 2 on YouTube](https://youtube.com/shorts/UoeUy4qeo60)
+
 The problem from Part 1: lamps, speakers, a music subscription — and an app for each of them.
 A big smart-home hub didn't fix it: it only knew two ways, **talk to it** or **tap an app**.
 I wanted a **switch on the wall that just works** — for everyone in the family.
@@ -44,4 +46,4 @@ Then **check it** — the last sentence of the prompt matters: ask what could go
 Idea: human. Code: AI. Checked: human.
 
 ---
-← [Part 1](../01-my-smart-home-wasnt-smart/) · Next: Part 3 — The first chip *(coming soon)*
+← [Part 1](../01-my-smart-home-wasnt-smart/) · Next: [Part 3 — The first chip](../03-the-first-chip/)

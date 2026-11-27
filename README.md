@@ -26,6 +26,15 @@ that charge when the sun actually hits the window, kids helping to build their o
 
 ▶️ **YouTube:** [Ideas, Unstuck — the playlist](https://www.youtube.com/playlist?list=PLeLg2Pkrl_X4) · channel [@workFLOw42](https://www.youtube.com/@workFLOw42)
 
+| Part | Episode | Video | Code & notes |
+|---|---|---|---|
+| 1 | My smart home wasn't smart | [▶️ watch](https://youtube.com/shorts/_x9Uto50TOY) | [episodes/01](episodes/01-my-smart-home-wasnt-smart/) |
+| 2 | One system instead of five apps | [▶️ watch](https://youtube.com/shorts/UoeUy4qeo60) | [episodes/02](episodes/02-one-system-instead-of-five-apps/) |
+| 3 | The first chip | coming Thu, Dec 3 | [episodes/03](episodes/03-the-first-chip/) |
+| 4 | The randomizer | coming Thu, Dec 10 | — |
+
+New parts every **Thursday, 6 pm CET**.
+
 ## Structure — example code per episode
 
 Each episode gets its own folder with a short guide and the example code shown in it —
